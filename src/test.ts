@@ -1,20 +1,7 @@
-import winstonLogger from './winstonLogger';
+const a = [1, 2, 3];
 
-function main () {
-  for (let i = 0; i < 10; i++) {
-    run(i);
-  }
-}
+const b = [2, 3];
 
-function run (idx: number) {
-  try {
-    console.log('start');
-    if (idx >= 3) throw Error('run failed');
-    console.log('main');
-  } catch (e) {
-    winstonLogger.info('info message');
-    winstonLogger.error('info message');
-  }
-}
+b.push(...Array.from(a.keys()));
 
-main();
+console.log(b);
