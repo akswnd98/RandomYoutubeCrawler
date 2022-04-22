@@ -10,14 +10,16 @@ import GetPageRankOperation from './CrawlingCurrent/PageRankMethod/HashAdapter/O
 
 const nodes = [
   { id: 'hello' },
+  { id: 'world' },
   { id: 'nice' },
-  { id: 'owow' },
+  { id: 'to' },
+  { id: 'meet' },
 ];
 
 const edges = [
-  { baseId: 'hello', relatedId: 'nice' },
-  { baseId: 'hello', relatedId: 'owow' },
-  { baseId: 'owow', relatedId: 'nice' },
+  { baseId: 'hello', relatedId: 'world' },
+  { baseId: 'hello', relatedId: 'to' },
+  { baseId: 'world', relatedId: 'meet' },
 ];
 
 (async () => {
@@ -29,9 +31,10 @@ const edges = [
     const expandOperation = new Expand({ crawlingCurrent });
     expandOperation.expand({
       edges: [
-        { baseId: 'hello', relatedId: 'nice' },
-        { baseId: 'nice', relatedId: 'hello' },
-        { baseId: 'owow', relatedId: 'nice' },
+        { baseId: 'nice', relatedId: 'world' },
+        { baseId: 'nice', relatedId: 'meet' },
+        { baseId: 'to', relatedId: 'nice' },
+        { baseId: 'to', relatedId: 'meet' },
       ],
     });
     const printAllOperation = new PrintAll({ crawlingCurrent });

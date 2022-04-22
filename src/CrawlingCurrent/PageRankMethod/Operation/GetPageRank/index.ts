@@ -5,7 +5,7 @@ export type ConstructorParam = {
 
 export default class GetPageRank extends Operation {
   private beta: number = 0.8;
-  private eps: number = 1e-3;
+  private eps: number = 1e-6;
 
   constructor (payload: ConstructorParam) {
     super(payload);
@@ -14,18 +14,17 @@ export default class GetPageRank extends Operation {
   getPageRank () {
     let prevRank = [];
     let rank = new Array(this.currentState.reverseMDPGraph.length).fill(undefined).map(() => 1 / Math.sqrt(this.currentState.reverseMDPGraph.length));
-    let count = 0;
     do {
       prevRank = rank;
       rank = this.getNextStep(prevRank);
-    } while (this.checkTolerance(prevRank, rank));
+    } while (!this.checkTolerance(prevRank, rank));
     return rank;
   }
 
   private getNextStep (rank: number[]) {
     const globalSum = this.getGlobalSum(rank);
     const rankSum = this.getRankSum(rank);
-    const ret = new Array(this.currentState.reverseMDPGraph.length).fill(undefined).map(() => globalSum + (1 - this.beta) * rankSum);
+    const ret = new Array(this.currentState.reverseMDPGraph.length).fill(undefined).map(() => globalSum + (1 - this.beta) * rankSum / this.currentState.reverseMDPGraph.length);
     this.currentState.reverseMDPGraph.forEach((v, i) => {
       v.forEach((vv) => {
         ret[i] += this.beta * rank[vv] / this.currentState.mdpGraph[vv].length;
@@ -50,7 +49,7 @@ export default class GetPageRank extends Operation {
         ret += (1 / this.currentState.reverseMDPGraph.length) * rank[i];
       }
     });
-    return ret;
+    return ret * this.beta;
   }
 
   private getDot (rank1: number[], rank2: number[]) {
@@ -72,6 +71,6 @@ export default class GetPageRank extends Operation {
   private checkTolerance (vec1: number[], vec2: number[]) {
     const dot = this.getDot(vec1, vec2);
     const sizeMul = this.getNorm(vec1) * this.getNorm(vec2);
-    return dot < sizeMul + this.eps && dot > sizeMul - this.eps;
+    return dot < sizeMul * (1 + this.eps) && dot > sizeMul * (1 - this.eps);
   }
 }
