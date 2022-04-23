@@ -13,7 +13,7 @@ export default class PrintAll extends Operation {
   
   constructor (payload: ConstructorParam) {
     super(payload);
-    this.printAllOperation = new PrintAllOperation({ crawlingCurrent: this.currentState.pageRankMethodCurrent });
+    this.printAllOperation = new PrintAllOperation({ graphCurrent: this.currentState.graphCurrent });
   }
 
   printAll () {

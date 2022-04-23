@@ -2,65 +2,75 @@ import * as selenium from 'selenium-webdriver';
 import chrome, { Driver } from 'selenium-webdriver/chrome';
 import chromedriver from 'chromedriver';
 import dotenv from 'dotenv';
-import HashAdapter from './CrawlingCurrent/PageRankMethod/HashAdapter';
-import Init from './CrawlingCurrent/PageRankMethod/HashAdapter/Operation/Init';
-import PrintAll from './CrawlingCurrent/PageRankMethod/HashAdapter/Operation/PrintAll';
-import Expand from './CrawlingCurrent/PageRankMethod/HashAdapter/Operation/Expand';
-import GetPageRankOperation from './CrawlingCurrent/PageRankMethod/HashAdapter/Operation/GetPageRank';
+import NegativePageRankExpander from './Expander/NegativePageRankExpander';
+import HashAdapter from './CrawlingCurrent/PageRankMethod/Graph/HashAdapter';
+import VisitMap from './CrawlingCurrent/PageRankMethod/VisitMap';
+import InitGraphOperation from './CrawlingCurrent/PageRankMethod/Graph/HashAdapter/Operation/Init';
+import InitVisitMapOperation from './CrawlingCurrent/PageRankMethod/VisitMap/Operation/Init';
+import PrintAllGraphOperation from './CrawlingCurrent/PageRankMethod/Graph/HashAdapter/Operation/PrintAll';
+import PrintAllVisitOperation from './CrawlingCurrent/PageRankMethod/VisitMap/Operation/PrintAll';
+import winstonLogger from './winstonLogger';
+import winston from 'winston';
+import path from 'path';
+import GetAllVisitOperation from './CrawlingCurrent/PageRankMethod/VisitMap/Operation/GetAll';
 
-const nodes = [
-  { id: 'hello' },
-  { id: 'world' },
-  { id: 'nice' },
-  { id: 'to' },
-  { id: 'meet' },
-];
+const initialGraph = {
+  nodes: [
+    {
+      id: '5bXl_WA-djM',
+    }, {
+      id: 'Y7r2znabAEQ',
+    }
+  ],
+  edges: [],
+};
 
-const edges = [
-  { baseId: 'hello', relatedId: 'world' },
-  { baseId: 'hello', relatedId: 'to' },
-  { baseId: 'world', relatedId: 'meet' },
-];
+const initialVisitMap = {
+  nodes: [
+    {
+      id: '5bXl_WA-djM',
+      visit: false,
+    }, {
+      id: 'Y7r2znabAEQ',
+      visit: false,
+    },
+  ],
+};
 
 (async () => {
   try {
     dotenv.config();
-    const crawlingCurrent = new HashAdapter();
-    const initOperation = new Init({ crawlingCurrent });
-    initOperation.init({ nodes, edges });
-    const expandOperation = new Expand({ crawlingCurrent });
-    expandOperation.expand({
-      edges: [
-        { baseId: 'nice', relatedId: 'world' },
-        { baseId: 'nice', relatedId: 'meet' },
-        { baseId: 'to', relatedId: 'nice' },
-        { baseId: 'to', relatedId: 'meet' },
-      ],
+    await initChromeService();
+    const driver = await createDriver();
+    const graphCurrent = new HashAdapter();
+    const visitMapCurrent = new VisitMap();
+    const printAllVisitOperation = new PrintAllVisitOperation({ visitMapCurrent });
+    const getAllVisitOperation = new GetAllVisitOperation({ visitMapCurrent });
+    new InitGraphOperation({ graphCurrent }).init(initialGraph);
+    new InitVisitMapOperation({ visitMapCurrent }).init(initialVisitMap);
+    const expander = new NegativePageRankExpander({
+      driver,
+      graphCurrent,
+      visitMapCurrent,
     });
-    const printAllOperation = new PrintAll({ crawlingCurrent });
-    printAllOperation.printAll();
-    const getPageRankOperation = new GetPageRankOperation({ crawlingCurrent });
-    console.log(getPageRankOperation.getPageRank());
+    let step = 0;
+    let timeDiff = Date.now();
+    while (1) {
+      console.log(`step: ${step}`);
+      winstonLogger
+        .clear()
+        .add(new winston.transports.File({ filename: path.resolve(__dirname, `../log/error_${step}.log`), level: 'error' }))
+        .add(new winston.transports.File({ filename: path.resolve(__dirname, `../log/info_${step}.log`), level: 'info' }))
+      await expander.expandOneStep();
+      winstonLogger.info(getAllVisitOperation.getAll());
+      console.log((Date.now() - timeDiff) / 1000);
+      timeDiff = Date.now();
+      step++;
+    }
   } catch (e) {
-    console.log(e);
+    winstonLogger.error(e);
   }
 })();
-
-// (async () => {
-//   try {
-//     dotenv.config();
-//     await initChromeService();
-//     const driver = await createDriver();
-//     const start = Date.now();
-//     const lists = await getLimitedRelatedLinks(driver, 'https://www.youtube.com/watch?v=hWEHcSpoTKE', 10);
-//     const end = Date.now();
-//     console.log(lists);
-//     console.log(`${(end - start) / 1000} 초`);
-    
-//   } catch (e) {
-//     console.log(e);
-//   }
-// })();
 
 async function initChromeService () {
   const service = new chrome.ServiceBuilder(chromedriver.path).build();

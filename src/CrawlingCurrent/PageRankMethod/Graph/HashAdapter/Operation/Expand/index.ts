@@ -13,13 +13,12 @@ export type Edge = {
   relatedId: string;
 };
 
-
 export default class Expand extends Operation {
   private expandOperation: ExpandOperation;
 
   constructor (payload: ConstructorParam) {
     super(payload);
-    this.expandOperation = new ExpandOperation({ crawlingCurrent: this.currentState.pageRankMethodCurrent });
+    this.expandOperation = new ExpandOperation({ graphCurrent: this.currentState.graphCurrent });
   }
 
   expand (payload: PayloadParam) {

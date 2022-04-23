@@ -1,7 +1,5 @@
-const a = [1, 2, 3];
+const map: Map<string, boolean> = new Map<string, boolean>();
+map.set('gjosd', true);
+map.set('jgbhsd', false);
 
-const b = [2, 3];
-
-b.push(...Array.from(a.keys()));
-
-console.log(b);
+console.log(JSON.stringify(Array.from(map.keys())));

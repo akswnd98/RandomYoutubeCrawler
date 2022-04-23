@@ -19,6 +19,11 @@ Node.init({
     type: DataTypes.STRING,
     allowNull: false,
   },
+  visit: {
+    field: 'visit',
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
 }, {
   tableName: 'Node',
   sequelize: db,

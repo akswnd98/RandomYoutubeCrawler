@@ -23,7 +23,7 @@ export default class Init extends Operation {
 
   constructor (payload: ConstructorParam) {
     super(payload);
-    this.initOperation = new InitOperation({ crawlingCurrent: this.currentState.pageRankMethodCurrent });
+    this.initOperation = new InitOperation({ graphCurrent: this.currentState.graphCurrent });
   }
 
   init (payload: PayloadParam) {

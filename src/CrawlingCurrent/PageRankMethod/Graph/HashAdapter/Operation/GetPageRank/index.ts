@@ -9,7 +9,7 @@ export default class GetPageRank extends Operation {
 
   constructor (payload: ConstructorParam) {
     super(payload);
-    this.getPageRankOperation = new GetPageRankOperation({ crawlingCurrent: this.currentState.pageRankMethodCurrent });
+    this.getPageRankOperation = new GetPageRankOperation({ graphCurrent: this.currentState.graphCurrent });
   }
 
   getPageRank () {

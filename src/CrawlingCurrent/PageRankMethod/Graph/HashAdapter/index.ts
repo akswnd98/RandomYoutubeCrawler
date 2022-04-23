@@ -1,10 +1,10 @@
-import PageRankMethod from '..';
+import Graph from '..';
 import Operation from './Operation';
 
 export type CurrentState = {
   hashIndexMap: HashIndexMap;
   indexHashMap: IndexHashMap;
-  pageRankMethodCurrent: PageRankMethod;
+  graphCurrent: Graph;
 };
 
 export type IndexBaseMDPGraph = number[][];
@@ -20,7 +20,7 @@ export default class HashAdapter {
     this.currentState = {
       hashIndexMap: new Map<string, number>(),
       indexHashMap: [],
-      pageRankMethodCurrent: new PageRankMethod(),
+      graphCurrent: new Graph(),
     };
   }
 

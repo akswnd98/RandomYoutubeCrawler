@@ -1,5 +1,6 @@
 import winston, { info } from 'winston';
 import dotenv from 'dotenv';
+import path from 'path';
 
 dotenv.config();
 
@@ -7,8 +8,8 @@ const logger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
   transports: [
-    new winston.transports.File({ filename: 'log/info.log', level: 'info' }),
-    new winston.transports.File({ filename: 'log/error.log', level: 'error' }),
+    new winston.transports.File({ filename: path.resolve('../..', 'log/info.log'), level: 'info' }),
+    new winston.transports.File({ filename: path.resolve('../..', 'log/error.log'), level: 'error' }),
   ],
 });
 

@@ -8,6 +8,7 @@ export type PayloadParam = {
 export default class PrintAll extends Operation {
   printAll (payload: PayloadParam) {
     this.currentState.mdpGraph.forEach((v, i) => {
+      console.log(`baseId: ${payload.indexHashMap[i]}`);
       v.forEach((vv) => {
         console.log(`baseId: ${payload.indexHashMap[i]} -> relatedId: ${payload.indexHashMap[vv]}`);
       });

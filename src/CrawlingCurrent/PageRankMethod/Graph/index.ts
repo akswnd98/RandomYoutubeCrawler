@@ -7,7 +7,7 @@ export type CurrentState = {
 
 export type IndexBaseMDPGraph = number[][];
 
-export default class PageRankMethod {
+export default class Graph {
   private currentState: CurrentState;
 
   constructor () {
@@ -18,6 +18,6 @@ export default class PageRankMethod {
   }
 
   bindOperation (operation: Operation) {
-    operation.bindCrawlingCurrent(this.currentState);
+    operation.bindGraphCurrent(this.currentState);
   }
 }

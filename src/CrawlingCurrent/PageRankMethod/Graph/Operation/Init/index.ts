@@ -29,9 +29,7 @@ export default class Init extends Operation {
   }
 
   private allocSpace (payload: PayloadParam) {
-    this.currentState.reverseMDPGraph = [];
     this.currentState.reverseMDPGraph.push(...(new Array(payload.nodes.length)).fill(undefined).map<number[]>(() => []));
-    this.currentState.mdpGraph = [];
     this.currentState.mdpGraph.push(...(new Array(payload.nodes.length)).fill(undefined).map<number[]>(() => []));
   }
 

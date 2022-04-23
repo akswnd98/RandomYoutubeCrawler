@@ -1,17 +1,17 @@
-import PageRankMethod, { CurrentState } from '..';
+import Graph, { CurrentState } from '..';
 
 export type ConstructorParam = {
-  crawlingCurrent: PageRankMethod;
+  graphCurrent: Graph;
 };
 
 export default class Operation {
   protected currentState!: CurrentState;
 
   constructor (payload: ConstructorParam) {
-    payload.crawlingCurrent.bindOperation(this);
+    payload.graphCurrent.bindOperation(this);
   }
 
-  bindCrawlingCurrent (currentState: CurrentState) {
+  bindGraphCurrent (currentState: CurrentState) {
     this.currentState = currentState;
   }
 }

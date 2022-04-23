@@ -2,14 +2,14 @@ import HashAdapter, { CurrentState } from '..';
 import PageRankMethod from '../..';
 
 export type ConstructorParam = {
-  crawlingCurrent: HashAdapter;
+  graphCurrent: HashAdapter;
 };
 
 export default class Operation {
   protected currentState!: CurrentState;
 
   constructor (payload: ConstructorParam) {
-    payload.crawlingCurrent.bindOperation(this);
+    payload.graphCurrent.bindOperation(this);
   }
 
   bindAdapter (currentState: CurrentState) {
