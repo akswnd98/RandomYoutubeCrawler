@@ -8,6 +8,8 @@ import ExpandVisitMapOperation from '../../CrawlingCurrent/PageRankMethod/VisitM
 import * as selenium from 'selenium-webdriver';
 import { waitFor } from './util';
 import winstonLogger from '../../winstonLogger';
+import NodeModel from '@/src/db/Node';
+import EdgeModel from '@/src/db/Edge';
 
 export type ConstructorParam = {
   driver: selenium.WebDriver;
@@ -21,7 +23,7 @@ export type Edge = {
 };
 
 export default class NegativePageRankExpander extends Expander {
-  static MAX_SELECT_NUM = 100;
+  static MAX_SELECT_RATE = 0.001;
   static MAX_RELATED_NUM = 20;
 
   private driver: selenium.WebDriver;
@@ -44,16 +46,21 @@ export default class NegativePageRankExpander extends Expander {
   }
 
   async expandOneStep () {
-    const newEdges = await this.crawlRelated(this.selectIds());
-    this.expandGraphOperation.expand({ edges: newEdges });
-    this.expandVisitMapOperation.expand({ edges: newEdges });
+    try {
+      const newEdges = await this.crawlRelated(this.selectIds());
+      this.expandGraphOperation.expand({ edges: newEdges });
+      this.expandVisitMapOperation.expand({ edges: newEdges });
+      // await this.saveToDB(newEdges);
+    } catch (e) {
+
+    }
   }
 
   selectIds () {
     const rank = this.getPageRankOperation.getPageRank();
     const rankSort = Array.from(rank.entries()).sort((a, b) => a[1] - b[1]);
     const selectedIds = [];
-    for (let i = 0, j = 0; i < rankSort.length && j < NegativePageRankExpander.MAX_SELECT_NUM; i++) {
+    for (let i = 0, j = 0; i < rankSort.length && j < rankSort.length * NegativePageRankExpander.MAX_SELECT_RATE; i++) {
       if (!this.checkIsVisitOperation.checkIsVisit({ id: rankSort[i][0] })) {
         selectedIds.push(rankSort[i][0]);
         j++;
@@ -71,6 +78,16 @@ export default class NegativePageRankExpander extends Expander {
       });
     }
     return ret;
+  }
+
+  async saveToDB (newEdges: Edge[]) {
+    const newNodes = this.getNewNodeIds(newEdges).map((v) => ({ ytId: v, visit: false }));
+    try {
+      await NodeModel.bulkCreate(newNodes);
+      await EdgeModel.bulkCreate(newEdges);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async getLimitedRelatedLinks (driver: selenium.WebDriver, url: string, maxNum: number) {
@@ -108,5 +125,15 @@ export default class NegativePageRankExpander extends Expander {
     const lastIdx = searchAnd < 0 ? matched.length : searchAnd;
     matched = matched.substring(0, lastIdx);
     return matched;
+  }
+
+  getNewNodeIds (newEdges: Edge[]) {
+    let ret: string[] = [];
+    newEdges.forEach((v) => {
+      if (!this.checkIsVisitOperation.checkIsVisit({ id: v.relatedId })) {
+        ret.push(v.relatedId);
+      }
+    });
+    return ret;
   }
 }
