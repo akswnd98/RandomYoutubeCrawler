@@ -24,7 +24,8 @@ export default class GetPageRank extends Operation {
   private getNextStep (rank: number[]) {
     const globalSum = this.getGlobalSum(rank);
     const rankSum = this.getRankSum(rank);
-    const ret = new Array(this.currentState.reverseMDPGraph.length).fill(undefined).map(() => globalSum + (1 - this.beta) * rankSum / this.currentState.reverseMDPGraph.length);
+    const ret = new Array(this.currentState.reverseMDPGraph.length).fill(undefined).map((v, i) => (globalSum + (1 - this.beta) * (rankSum - rank[i]) / (this.currentState.reverseMDPGraph.length - 1)));
+    this.makeDiagZero(rank, ret);
     this.currentState.reverseMDPGraph.forEach((v, i) => {
       v.forEach((vv) => {
         ret[i] += this.beta * rank[vv] / this.currentState.mdpGraph[vv].length;
@@ -46,10 +47,18 @@ export default class GetPageRank extends Operation {
     let ret = 0;
     this.currentState.mdpGraph.forEach((v, i) => {
       if (v.length === 0) {
-        ret += (1 / this.currentState.reverseMDPGraph.length) * rank[i];
+        ret += (1 / (this.currentState.reverseMDPGraph.length - 1)) * rank[i];
       }
     });
     return ret * this.beta;
+  }
+
+  private makeDiagZero (rank: number[], ret: number[]) {
+    this.currentState.mdpGraph.forEach((v, i) => {
+      if (v.length === 0) {
+        ret[i] -= (1 / (this.currentState.reverseMDPGraph.length - 1)) * rank[i] * this.beta;
+      }
+    });
   }
 
   private getDot (rank1: number[], rank2: number[]) {
