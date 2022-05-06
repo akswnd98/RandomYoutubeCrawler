@@ -72,6 +72,7 @@ async function createDriver () {
       '--disable-dev-shm-usage',
       '--single-process',
     );
+    options.setChromeBinaryPath('/usr/bin/chromium-browser');
     return await new selenium.Builder().forBrowser('chrome').setChromeOptions(options).build();
   } catch (e) {
     winstonLogger.error(e);
