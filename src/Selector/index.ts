@@ -22,7 +22,6 @@ export default class Selector {
     const rank = this.getPageRankOperation.getPageRank();
     const rankSort = Array.from(rank.entries()).sort((a, b) => a[1] - b[1]);
     const selectedIds = [];
-    console.log(Math.max(1, rankSort.length * Selector.MAX_SELECT_RATE));
     for (let i = 0, j = 0; i < rankSort.length && j < Math.max(1, rankSort.length * Selector.MAX_SELECT_RATE); i++) {
       if (!this.checkIsVisitOperation.checkIsVisit({ id: rankSort[i][0] })) {
         selectedIds.push(rankSort[i][0]);
