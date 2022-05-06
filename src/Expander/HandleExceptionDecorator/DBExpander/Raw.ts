@@ -31,6 +31,7 @@ export default class Raw extends Expander {
       if (await NodeModel.findOne({ where: { ytId: edge.baseId } }) === null) {
         await this.expandNodeSafely({ id: edge.baseId });
       }
+      await this.updateVisitSafely({ id: edge.baseId });
       if (await NodeModel.findOne({ where: { ytId: edge.relatedId } }) === null) {
         await this.expandNodeSafely({ id: edge.relatedId });
       }
@@ -46,6 +47,17 @@ export default class Raw extends Expander {
         await this.failNodeExpansion(node);
       }
       throw Error('expandNodeSafely failed');
+    } catch (e) {
+      return;
+    }
+  }
+
+  private async updateVisitSafely (node: Node) {
+    try {
+      for (let i = 0; i < this.iterationCount; i++) {
+        await NodeModel.update({ visit: true }, { where: { ytId: node.id } });
+      }
+      throw Error('updateVisitSafely failed');
     } catch (e) {
       return;
     }
