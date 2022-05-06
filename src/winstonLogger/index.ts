@@ -8,8 +8,8 @@ const logger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
   transports: [
-    new winston.transports.File({ filename: path.resolve('../..', 'log/info.log'), level: 'info' }),
-    new winston.transports.File({ filename: path.resolve('../..', 'log/error.log'), level: 'error' }),
+    new winston.transports.File({ filename: path.resolve(__dirname, '../..', 'log/info.log'), level: 'info' }),
+    new winston.transports.File({ filename: path.resolve(__dirname, '../..', 'log/error.log'), level: 'error' }),
   ],
 });
 

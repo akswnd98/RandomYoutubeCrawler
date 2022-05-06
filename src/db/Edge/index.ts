@@ -26,7 +26,7 @@ Edge.init({
     allowNull: false,
   },
 }, {
-  tableName: 'Node',
+  tableName: 'Edge',
   sequelize: db,
   timestamps: false,
 });

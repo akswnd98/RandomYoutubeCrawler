@@ -2,17 +2,18 @@ import * as selenium from 'selenium-webdriver';
 import chrome, { Driver } from 'selenium-webdriver/chrome';
 import chromedriver from 'chromedriver';
 import dotenv from 'dotenv';
-import NegativePageRankExpander from './Expander/NegativePageRankExpander';
+import NegativePageRankExpander from './MultiExpander/NegativePageRankExpander';
 import HashAdapter from './CrawlingCurrent/PageRankMethod/Graph/HashAdapter';
 import VisitMap from './CrawlingCurrent/PageRankMethod/VisitMap';
 import InitGraphOperation from './CrawlingCurrent/PageRankMethod/Graph/HashAdapter/Operation/Init';
 import InitVisitMapOperation from './CrawlingCurrent/PageRankMethod/VisitMap/Operation/Init';
-import PrintAllGraphOperation from './CrawlingCurrent/PageRankMethod/Graph/HashAdapter/Operation/PrintAll';
-import PrintAllVisitOperation from './CrawlingCurrent/PageRankMethod/VisitMap/Operation/PrintAll';
 import winstonLogger from './winstonLogger';
-import winston from 'winston';
-import path from 'path';
-import GetAllVisitOperation from './CrawlingCurrent/PageRankMethod/VisitMap/Operation/GetAll';
+import Selector from './Selector';
+import GetPageRankOperation from './CrawlingCurrent/PageRankMethod/Graph/HashAdapter/Operation/GetPageRank';
+import CheckIsVisitOperation from './CrawlingCurrent/PageRankMethod/VisitMap/Operation/CheckIsVisit';
+import ExpandGraphOperation from './CrawlingCurrent/PageRankMethod/Graph/HashAdapter/Operation/Expand';
+import ExpandVisitMapOperation from './CrawlingCurrent/PageRankMethod/VisitMap/Operation/Expand';
+import Crawler from './Crawler';
 
 const initialGraph = {
   nodes: [
@@ -44,25 +45,25 @@ const initialVisitMap = {
     const driver = await createDriver();
     const graphCurrent = new HashAdapter();
     const visitMapCurrent = new VisitMap();
-    const printAllVisitOperation = new PrintAllVisitOperation({ visitMapCurrent });
-    const getAllVisitOperation = new GetAllVisitOperation({ visitMapCurrent });
     new InitGraphOperation({ graphCurrent }).init(initialGraph);
     new InitVisitMapOperation({ visitMapCurrent }).init(initialVisitMap);
+    const getPageRankOperation = new GetPageRankOperation({ graphCurrent });
+    const checkIsVisitOperation = new CheckIsVisitOperation({ visitMapCurrent });
+    const expandGraphOperation = new ExpandGraphOperation({ graphCurrent });
+    const expandVisitMapOperation = new ExpandVisitMapOperation({ visitMapCurrent });
+    const selector = new Selector({ getPageRankOperation, checkIsVisitOperation });
+    const crawler = new Crawler({ driver });
     const expander = new NegativePageRankExpander({
-      driver,
-      graphCurrent,
-      visitMapCurrent,
+      expandGraphOperation,
+      expandVisitMapOperation,
     });
     let step = 0;
     let timeDiff = Date.now();
     while (1) {
       console.log(`step: ${step}`);
-      winstonLogger
-        .clear()
-        .add(new winston.transports.File({ filename: path.resolve(__dirname, `../log/error_${step}.log`), level: 'error' }))
-        .add(new winston.transports.File({ filename: path.resolve(__dirname, `../log/info_${step}.log`), level: 'info' }))
-      await expander.expandOneStep();
-      winstonLogger.info(getAllVisitOperation.getAll());
+      const selectedIds = selector.select();
+      const newEdges = await crawler.crawl(selectedIds);
+      await expander.expand({ edges: newEdges });
       console.log((Date.now() - timeDiff) / 1000);
       timeDiff = Date.now();
       step++;

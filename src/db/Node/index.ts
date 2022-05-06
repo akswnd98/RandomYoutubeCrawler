@@ -4,6 +4,7 @@ import db from '..';
 export default class Node extends Model {
   id?: number;
   ytId?: string;
+  visit?: boolean;
 };
 
 Node.init({
