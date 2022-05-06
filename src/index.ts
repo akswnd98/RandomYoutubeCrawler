@@ -64,12 +64,17 @@ async function initChromeService () {
 }
 
 async function createDriver () {
-  const options = new chrome.Options();
-  options.addArguments(
-    '--headless',
-    '--no-sandbox',
-    '--disable-dev-shm-usage',
-    '--single-process',
-  );
-  return await new selenium.Builder().forBrowser('chrome').setChromeOptions(options).build();
+  try {
+    const options = new chrome.Options();
+    options.addArguments(
+      '--headless',
+      '--no-sandbox',
+      '--disable-dev-shm-usage',
+      '--single-process',
+    );
+    return await new selenium.Builder().forBrowser('chrome').setChromeOptions(options).build();
+  } catch (e) {
+    winstonLogger.error(e);
+    throw Error('createDriver failed');
+  }
 }
