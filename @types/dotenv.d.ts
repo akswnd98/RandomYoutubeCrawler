@@ -8,5 +8,8 @@ declare namespace NodeJS {
     DB_PORT: number;
     DB_USER: string;
     DB_PW: string;
+
+    CHROME_PATH: string;
+    CHROMEDRIVER_PATH: string;
   }
 }

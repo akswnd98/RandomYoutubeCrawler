@@ -1,6 +1,5 @@
 import * as selenium from 'selenium-webdriver';
 import chrome, { Driver } from 'selenium-webdriver/chrome';
-import chromedriver from 'chromedriver';
 import dotenv from 'dotenv';
 import NegativePageRankExpander from './MultiExpander/NegativePageRankExpander';
 import HashAdapter from './CrawlingCurrent/PageRankMethod/Graph/HashAdapter';
@@ -59,7 +58,7 @@ import Crawler from './Crawler';
 })();
 
 async function initChromeService () {
-  const service = new chrome.ServiceBuilder(chromedriver.path).build();
+  const service = new chrome.ServiceBuilder(process.env.CHROMEDRIVER_PATH).build();
   chrome.setDefaultService(service);
 }
 
@@ -72,7 +71,7 @@ async function createDriver () {
       '--disable-dev-shm-usage',
       '--single-process',
     );
-    options.setChromeBinaryPath('/usr/bin/chromium-browser');
+    options.setChromeBinaryPath(process.env.CHROME_PATH);
     return await new selenium.Builder().forBrowser('chrome').setChromeOptions(options).build();
   } catch (e) {
     winstonLogger.error(e);
