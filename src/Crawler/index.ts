@@ -3,6 +3,7 @@ import { waitFor } from './util';
 import winstonLogger from '../winstonLogger';
 
 export type ConstructorParam = {
+  waitMs: number;
   driver: selenium.WebDriver;
 };
 
@@ -13,6 +14,8 @@ export type Edge = {
 
 export default class Crawler {
   private static MAX_RELATED_NUM = 20;
+
+  private waitMs = 3000;
 
   private driver: selenium.WebDriver;
 
@@ -39,7 +42,7 @@ export default class Crawler {
   private async getRelatedLinks (driver: selenium.WebDriver, url: string) {
     try {
       await driver.get(url);
-      await waitFor(3000);
+      await waitFor(this.waitMs);
       const elements = await driver.findElements(selenium.By.css('ytd-watch-next-secondary-results-renderer ytd-thumbnail a'));
       const links = await Promise.all(elements.map(async (v) => {
         try {

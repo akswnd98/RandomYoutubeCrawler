@@ -11,5 +11,7 @@ declare namespace NodeJS {
 
     CHROME_PATH: string;
     CHROMEDRIVER_PATH: string;
+
+    PAGE_ENTER_WAIT_MS: number;
   }
 }

@@ -35,7 +35,7 @@ import Crawler from './Crawler';
 
     const initializer = new Initializer({ initGraphOperation, initVisitMapOperation });
     const selector = new Selector({ getPageRankOperation, checkIsVisitOperation });
-    const crawler = new Crawler({ driver });
+    const crawler = new Crawler({ waitMs: process.env.PAGE_ENTER_WAIT_MS, driver });
     const expander = new NegativePageRankExpander({ expandGraphOperation, expandVisitMapOperation });
 
     await initializer.init();
