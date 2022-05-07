@@ -21,6 +21,7 @@ export default class Crawler {
 
   constructor (payload: ConstructorParam) {
     this.driver = payload.driver;
+    this.waitMs = payload.waitMs;
   }
 
   async crawl (selectedIds: string[]) {
