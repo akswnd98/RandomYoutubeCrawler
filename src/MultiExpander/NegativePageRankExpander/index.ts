@@ -17,8 +17,8 @@ export default class NegativePageRankExpander extends MultiExpander {
   }
 
   async expand (payload: PayloadParam) {
-    await Promise.all(payload.edges.map((v) => (
-      this.expander.expand({ edge: v })
-    )));
+    for (let i = 0; i < payload.edges.length; i++) {
+      await this.expander.expand({ edge: payload.edges[i] });
+    }
   }
 }
