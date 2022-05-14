@@ -49,6 +49,7 @@ export default class Crawler {
         try {
           return this.trimToId(await v.getAttribute('href'));
         } catch (e) {
+          winstonLogger.error(e);
           return undefined;
         }
       }));
@@ -58,6 +59,7 @@ export default class Crawler {
       });
       return ret;
     } catch (e) {
+      winstonLogger.error(e);
       winstonLogger.error(`getRelatedLinks failed: ${url}`);
       return [];
     }
