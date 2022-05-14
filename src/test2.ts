@@ -1,20 +1,4 @@
-function a () {
-  for(let i = 0; i < 5; i++) {
-    console.log(i);
-    if (i == 2) {
-      throw Error('hello');
-    }
-  }
-}
-
-function b () {
-  try {
-    a();
-  } catch (e) {
-    console.log(e);
-  }
-}
-
-b();
-
-console.log('asdf');
+const e = Error('hell world');
+console.log('name: ', e.name);
+console.log('message: ', e.message);
+console.log('stack: ', e.stack);
