@@ -47,6 +47,7 @@ import Crawler from './Crawler';
       const selectedIds = selector.select();
       winstonLogger.info(`크롤링 페이지 수: ${selectedIds.length}개`);
       const newEdges = await crawler.crawl(selectedIds);
+      winstonLogger.info(`크롤링된 id 수: ${newEdges.length}개`);
       await expander.expand({ edges: newEdges });
       winstonLogger.info(`경과 시간: ${(Date.now() - timeDiff) / 1000}초`);
       timeDiff = Date.now();
