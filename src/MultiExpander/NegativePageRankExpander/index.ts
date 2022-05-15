@@ -11,14 +11,18 @@ export type ConstructorParam = {
 export default class NegativePageRankExpander extends MultiExpander {
   expander: Expander;
 
+  maxBrowserTabNum: number = 10;
+
   constructor (payload: ConstructorParam) {
     super();
     this.expander = new Expander({ ...payload });
   }
 
   async expand (payload: PayloadParam) {
-    for (let i = 0; i < payload.edges.length; i++) {
-      await this.expander.expand({ edge: payload.edges[i] });
+    for (let i = 0; i < payload.edges.length; i *= this.maxBrowserTabNum) {
+      await Promise.all(payload.edges.slice(i, i + this.maxBrowserTabNum).map(async (v) => {
+        await this.expander.expand({ edge: v });
+      }));
     }
   }
 }
