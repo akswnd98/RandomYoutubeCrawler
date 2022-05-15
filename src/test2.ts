@@ -1,4 +1,15 @@
-const e = Error('hell world');
-console.log('name: ', e.name);
-console.log('message: ', e.message);
-console.log('stack: ', e.stack);
+import winstonLogger from '@/src/winstonLogger';
+
+function helloWorld () {
+  throw new Error('asdf');
+}
+
+function func () {
+  try {
+    helloWorld();
+  } catch (e: any) {
+    winstonLogger.error(e.stack);
+  }
+}
+
+func();

@@ -48,8 +48,8 @@ export default class Crawler {
       const links = await Promise.all(elements.map(async (v) => {
         try {
           return this.trimToId(await v.getAttribute('href'));
-        } catch (e) {
-          winstonLogger.error(e);
+        } catch (e: any) {
+          winstonLogger.error(e.stack);
           return undefined;
         }
       }));
@@ -58,8 +58,8 @@ export default class Crawler {
         if (v !== undefined) ret.push(v);
       });
       return ret;
-    } catch (e) {
-      winstonLogger.error(e);
+    } catch (e: any) {
+      winstonLogger.error(e.stack);
       winstonLogger.error(`getRelatedLinks failed: ${url}`);
       return [];
     }

@@ -52,8 +52,8 @@ import Crawler from './Crawler';
       timeDiff = Date.now();
       step++;
     }
-  } catch (e) {
-    winstonLogger.error(e);
+  } catch (e: any) {
+    winstonLogger.error(e.stack);
   }
 })();
 
@@ -73,8 +73,8 @@ async function createDriver () {
     );
     options.setChromeBinaryPath(process.env.CHROME_PATH);
     return await new selenium.Builder().forBrowser('chrome').setChromeOptions(options).build();
-  } catch (e) {
-    winstonLogger.error(e);
+  } catch (e: any) {
+    winstonLogger.error(e.stack);
     throw Error('createDriver failed');
   }
 }

@@ -20,8 +20,8 @@ export default class Raw extends Expander {
     try {
       await this.readyNodeForEdge(payload.edge);
       await this.expandEdgeSafely(payload.edge);
-    } catch (e) {
-      winstonLogger.error(e);
+    } catch (e: any) {
+      winstonLogger.error(e.stack);
       throw Error('Raw.expand failed');
     }
   }
@@ -35,8 +35,8 @@ export default class Raw extends Expander {
       if (await NodeModel.findOne({ where: { ytId: edge.relatedId } }) === null) {
         await this.expandNodeSafely({ id: edge.relatedId });
       }
-    } catch (e) {
-      winstonLogger.error(e);
+    } catch (e: any) {
+      winstonLogger.error(e.stack);
       throw Error('readyNodeForEdge failed');
     }
   }
@@ -71,8 +71,8 @@ export default class Raw extends Expander {
       } else {
         throw Error('failNodeExpansion isNode === false');
       }
-    } catch (e) {
-      winstonLogger.error(e);
+    } catch (e: any) {
+      winstonLogger.error(e.stack);
       return;
     }
     throw Error('failNodeExpansion failed');
@@ -98,8 +98,8 @@ export default class Raw extends Expander {
       } else {
         throw Error('failEdgeExpansion isValid === false');
       }
-    } catch (e) {
-      winstonLogger.error(e);
+    } catch (e: any) {
+      winstonLogger.error(e.stack);
       return;
     }
     throw Error('failEdgeExpansion failed');
