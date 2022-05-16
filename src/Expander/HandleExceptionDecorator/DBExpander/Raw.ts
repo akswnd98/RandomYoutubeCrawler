@@ -96,7 +96,7 @@ export default class Raw extends Expander {
       if (isValid) {
         await EdgeModel.create({ baseId: edge.baseId, relatedId: edge.relatedId });
       } else {
-        throw Error(`failEdgeExpansion: baseId, relatedId, edge = ${baseId}, ${relatedId}, ${dbEdge}`);
+        throw Error(`failEdgeExpansion: baseId, relatedId, edge == null = ${baseId?.ytId}, ${relatedId?.ytId}, ${dbEdge === null}`);
       }
     } catch (e: any) {
       winstonLogger.error(e.stack);
