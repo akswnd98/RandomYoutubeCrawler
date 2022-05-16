@@ -89,13 +89,14 @@ export default class Raw extends Expander {
 
   private async failEdgeExpansion (edge: Edge) {
     try {
-      const isValid = await NodeModel.findOne({ where: { ytId: edge.baseId } }) !== null
-        && await NodeModel.findOne({ where: { ytId: edge.relatedId } }) !== null
-        && await EdgeModel.findOne({ where: { [Op.and]: { baseId: edge.baseId, relatedId: edge.relatedId } } }) === null;
+      const baseId = await NodeModel.findOne({ where: { ytId: edge.baseId } });
+      const relatedId = await NodeModel.findOne({ where: { ytId: edge.relatedId } });
+      const dbEdge = await EdgeModel.findOne({ where: { [Op.and]: { baseId: edge.baseId, relatedId: edge.relatedId } } });
+      const isValid = baseId !== null && relatedId !== null && dbEdge === null;
       if (isValid) {
         await EdgeModel.create({ baseId: edge.baseId, relatedId: edge.relatedId });
       } else {
-        throw Error('failEdgeExpansion isValid === false');
+        throw Error(`failEdgeExpansion: baseId, relatedId, edge = ${baseId}, ${relatedId}, ${dbEdge}`);
       }
     } catch (e: any) {
       winstonLogger.error(e.stack);
