@@ -42,7 +42,7 @@ export default class Crawler {
 
   private async getRelatedLinks (url: string) {
     try {
-      await this.driver.get(url);
+      await this.requestGet(url);
       await waitFor(this.waitMs);
       const elements = await this.findRelatedElements(url);
       const links = await Promise.all(elements.map(async (v) => {
