@@ -12,8 +12,9 @@ import InitVisitMapOperation from './CrawlingCurrent/PageRankMethod/VisitMap/Ope
 import GetPageRankOperation from './CrawlingCurrent/PageRankMethod/Graph/HashAdapter/Operation/GetPageRank';
 import CheckIsVisitOperation from './CrawlingCurrent/PageRankMethod/VisitMap/Operation/CheckIsVisit';
 import ExpandGraphOperation from './CrawlingCurrent/PageRankMethod/Graph/HashAdapter/Operation/Expand';
-import ExpandVisitMapOperation from './CrawlingCurrent/PageRankMethod/VisitMap/Operation/Expand';
 import Crawler from './Crawler';
+import SetVisitOperation from './CrawlingCurrent/PageRankMethod/VisitMap/Operation/Set';
+import MultiVisitSetter from './MultiVisitSetter';
 
 // initial ytId: 5bXl_WA-djM, Y7r2znabAEQ
 
@@ -31,12 +32,13 @@ import Crawler from './Crawler';
     const getPageRankOperation = new GetPageRankOperation({ graphCurrent });
     const checkIsVisitOperation = new CheckIsVisitOperation({ visitMapCurrent });
     const expandGraphOperation = new ExpandGraphOperation({ graphCurrent });
-    const expandVisitMapOperation = new ExpandVisitMapOperation({ visitMapCurrent });
+    const setVisitOperation = new SetVisitOperation({ visitMapCurrent });
 
     const initializer = new Initializer({ initGraphOperation, initVisitMapOperation });
     const selector = new Selector({ getPageRankOperation, checkIsVisitOperation });
+    const visitSetter = new MultiVisitSetter({ setVisitOperation });
     const crawler = new Crawler({ waitMs: process.env.PAGE_ENTER_WAIT_MS, driver });
-    const expander = new NegativePageRankExpander({ expandGraphOperation, expandVisitMapOperation });
+    const expander = new NegativePageRankExpander({ expandGraphOperation });
 
     await initializer.init();
   
@@ -45,6 +47,7 @@ import Crawler from './Crawler';
     while (1) {
       winstonLogger.info(`step: ${step}`);
       const selectedIds = selector.select();
+      await visitSetter.set({nodes: selectedIds.map((v) => ({ id: v })) });
       winstonLogger.info(`크롤링 페이지 수: ${selectedIds.length}개`);
       const newEdges = await crawler.crawl(selectedIds);
       winstonLogger.info(`크롤링된 id 수: ${newEdges.length}개`);
