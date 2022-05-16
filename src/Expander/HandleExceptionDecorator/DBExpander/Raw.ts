@@ -72,7 +72,6 @@ export default class Raw extends Expander {
         throw Error('failNodeExpansion isNode === false');
       }
     } catch (e: any) {
-      winstonLogger.error(e.stack);
       return;
     }
     throw Error('failNodeExpansion failed');

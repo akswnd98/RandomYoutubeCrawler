@@ -27,7 +27,7 @@ export default class Crawler {
   async crawl (selectedIds: string[]) {
     const ret: Edge[] = [];
     for (let i = 0; i < selectedIds.length; i++) {
-      const links = await this.getLimitedRelatedLinks(this.driver, `https://youtube.com/watch?v=${selectedIds[i]}`, Crawler.MAX_RELATED_NUM);
+      const links = await this.getLimitedRelatedLinks(`https://youtube.com/watch?v=${selectedIds[i]}`, Crawler.MAX_RELATED_NUM);
       links.forEach((v) => {
         ret.push({ baseId: selectedIds[i], relatedId: v });
       });
@@ -35,16 +35,16 @@ export default class Crawler {
     return ret;
   }
 
-  private async getLimitedRelatedLinks (driver: selenium.WebDriver, url: string, maxNum: number) {
-    const links = await this.getRelatedLinks(driver, url);
+  private async getLimitedRelatedLinks (url: string, maxNum: number) {
+    const links = await this.getRelatedLinks(url);
     return links.slice(0, Math.min(maxNum, links.length));
   }
 
-  private async getRelatedLinks (driver: selenium.WebDriver, url: string) {
+  private async getRelatedLinks (url: string) {
     try {
-      await driver.get(url);
+      await this.driver.get(url);
       await waitFor(this.waitMs);
-      const elements = await driver.findElements(selenium.By.css('ytd-watch-next-secondary-results-renderer ytd-thumbnail a'));
+      const elements = await this.findRelatedElements(url);
       const links = await Promise.all(elements.map(async (v) => {
         try {
           return this.trimToId(await v.getAttribute('href'));
@@ -64,6 +64,24 @@ export default class Crawler {
       return [];
     }
   };
+
+  async requestGet (url: string) {
+    try {
+      await this.driver.get(url);
+    } catch (e: any) {
+      winstonLogger.error(e.stack);
+      throw Error(`requestGet failed: ${url}`);
+    }
+  }
+
+  async findRelatedElements (url: string) {
+    try {
+      return await this.driver.findElements(selenium.By.css('ytd-watch-next-secondary-results-renderer ytd-thumbnail a'));
+    } catch (e: any) {
+      winstonLogger.error(e.stack);
+      throw Error(`findRelatedElements: ${url}`);
+    }
+  }
 
   private trimToId (url: string) {
     let matched = /[\?\&]v\=.*/.exec(url)!.at(0)?.substring(3);
